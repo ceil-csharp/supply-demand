@@ -12,6 +12,7 @@
     <PackageTags>DependencyInjection;SupplyDemand;Functional</PackageTags>
     <RepositoryUrl>https://github.com/ceil-csharp/supply-demand.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/ceil-csharp/supply-demand</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
