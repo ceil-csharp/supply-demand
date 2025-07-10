@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Sergey Shkatula</Authors>
+    <Company>CEIL ceil.dev</Company>
+    <PackageId>SupplyDemand</PackageId>
+    <Version>0.1.0</Version>
+    <Title>SupplyDemand C# Library</Title>
+    <Description>C# supply-demand pattern implementation</Description>
+    <PackageTags>DependencyInjection;SupplyDemand;Functional</PackageTags>
+    <RepositoryUrl>https://github.com/ceil-csharp/supply-demand.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ceil-csharp/supply-demand</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>
