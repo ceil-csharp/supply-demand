@@ -6,7 +6,7 @@
     <Authors>Sergey Shkatula</Authors>
     <Company>CEIL ceil.dev</Company>
     <PackageId>SupplyDemand</PackageId>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Title>SupplyDemand C# Library</Title>
     <Description>C# supply-demand pattern implementation</Description>
     <PackageTags>DependencyInjection;SupplyDemand;Functional</PackageTags>
