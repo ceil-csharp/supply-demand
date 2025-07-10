@@ -33,7 +33,6 @@ namespace SupplyDemand
             DemandProps<TSuppliers, TNextType, TNextData> props
         )
         {
-            // 👇 Use the suppliers in the props, NOT scope.Suppliers!
             var suppliersDict = props.Suppliers as IDictionary<string, object>;
             if (suppliersDict == null)
                 throw new Exception("Suppliers registry does not implement IDictionary<string, object>");
