@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Xunit;
+using System.Collections.Generic;
 using SupplyDemand;
 
 namespace SupplyDemand.Tests
@@ -28,8 +29,6 @@ namespace SupplyDemand.Tests
                 {
                     Key = "child",
                     Type = "child",
-                    Path = "root/child",
-                    Data = null,
                     Suppliers = suppliers
                 })
             );
@@ -51,16 +50,12 @@ namespace SupplyDemand.Tests
                 {
                     Key = "first",
                     Type = "first",
-                    Path = "sum/first",
-                    Data = null,
                     Suppliers = suppliers
                 });
                 int b = await scope.Demand<string, object, int>(new DemandProps<SupplierRegistry, string, object>
                 {
                     Key = "second",
                     Type = "second",
-                    Path = "sum/second",
-                    Data = null,
                     Suppliers = suppliers
                 });
                 return a + b;
@@ -70,8 +65,6 @@ namespace SupplyDemand.Tests
                 {
                     Key = "sum",
                     Type = "sum",
-                    Path = "root/sum",
-                    Data = null,
                     Suppliers = suppliers
                 })
             );
@@ -90,8 +83,6 @@ namespace SupplyDemand.Tests
                 {
                     Key = "missing",
                     Type = "missing",
-                    Path = "root/missing",
-                    Data = null,
                     Suppliers = suppliers
                 })
             );
@@ -116,8 +107,6 @@ namespace SupplyDemand.Tests
                 {
                     Key = "async",
                     Type = "async",
-                    Path = "root/async",
-                    Data = null,
                     Suppliers = suppliers
                 })
             );
@@ -139,16 +128,12 @@ namespace SupplyDemand.Tests
                 {
                     Key = "first",
                     Type = "first",
-                    Path = "sum/first",
-                    Data = null,
                     Suppliers = suppliers
                 });
                 int b = await scope.Demand<string, object, int>(new DemandProps<SupplierRegistry, string, object>
                 {
                     Key = "second",
                     Type = "second",
-                    Path = "sum/second",
-                    Data = null,
                     Suppliers = suppliers
                 });
                 return a + b;
@@ -158,8 +143,6 @@ namespace SupplyDemand.Tests
                 {
                     Key = "sum",
                     Type = "sum",
-                    Path = "root/sum",
-                    Data = null,
                     Suppliers = suppliers
                 }));
 
@@ -187,16 +170,12 @@ namespace SupplyDemand.Tests
                 {
                     Type = "number",
                     Key = "number",
-                    Path = "sum/number",
-                    Data = null,
                     Suppliers = suppliers
                 });
                 string msg = await scope.Demand<string, object, string>(new DemandProps<SupplierRegistry, string, object>
                 {
                     Type = "message",
                     Key = "message",
-                    Path = "sum/message",
-                    Data = null,
                     Suppliers = suppliers
                 });
                 return $"{msg} Your number is {n}.";
@@ -214,8 +193,6 @@ namespace SupplyDemand.Tests
                 {
                     Type = "sum",
                     Key = "sum",
-                    Path = "root/sum",
-                    Data = null,
                     Suppliers = suppliers
                 })
             );
@@ -243,8 +220,6 @@ namespace SupplyDemand.Tests
                 {
                     Type = "number",
                     Key = "number",
-                    Path = "root/number",
-                    Data = null,
                     Suppliers = customSuppliers
                 });
             });
@@ -289,6 +264,60 @@ namespace SupplyDemand.Tests
 
             int output = await SupplyDemand.Init(rootSupplier, suppliers, (10, 11));
             Assert.Equal(42, output);
+        }
+
+        [Fact]
+        public async Task SupplyDemand_Path_BuildsCorrectlyOnNestedDemands()
+        {
+            var suppliers = new SupplierRegistry();
+
+            // Will capture the path seen at the 'leaf' supplier:
+            List<PathSegment> capturedPath = null;
+
+            suppliers["leaf"] = new Supplier<object, int>((data, scope) =>
+            {
+                capturedPath = (scope.Path != null) ? new List<PathSegment>(scope.Path) : null;
+                return Task.FromResult(99);
+            });
+
+            suppliers["middle"] = new Supplier<object, int>(async (data, scope) =>
+                await scope.Demand<string, object, int>(new DemandProps<SupplierRegistry, string, object>
+                {
+                    Type = "leaf",
+                    Key = "leaf1",
+                    Suppliers = suppliers
+                })
+            );
+
+            suppliers["$$root"] = new Supplier<object, int>(async (data, scope) =>
+                await scope.Demand<string, object, int>(new DemandProps<SupplierRegistry, string, object>
+                {
+                    Type = "middle",
+                    Key = "mid",
+                    Suppliers = suppliers
+                })
+            );
+
+            var rootSupplier = (Supplier<object, int>)suppliers["$$root"];
+
+            var result = await SupplyDemand.Init(rootSupplier, suppliers);
+
+            Assert.Equal(99, result);
+
+            // Path should record the full call chain:
+            Assert.NotNull(capturedPath);
+            Assert.Collection(capturedPath,
+                item =>
+                {
+                    Assert.Equal("mid", item.Key);
+                    Assert.Equal("middle", item.Type);
+                },
+                item =>
+                {
+                    Assert.Equal("leaf1", item.Key);
+                    Assert.Equal("leaf", item.Type);
+                }
+            );
         }
     }
 }

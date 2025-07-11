@@ -48,16 +48,12 @@ class Program
             {
                 Type = "number",
                 Key = "number",
-                Path = "sum/number",
-                Data = null,
                 Suppliers = suppliers
             });
             string msg = await scope.Demand<string, object, string>(new DemandProps<SupplierRegistry, string, object>
             {
                 Type = "message",
                 Key = "message",
-                Path = "sum/message",
-                Data = null,
                 Suppliers = suppliers
             });
             return $"{msg} Your number is {n}.";
@@ -75,8 +71,6 @@ class Program
             {
                 Type = "sum",
                 Key = "sum",
-                Path = "root/sum",
-                Data = null,
                 Suppliers = suppliers
             })
         );
@@ -114,8 +108,6 @@ var rootSupplier = new Supplier<object, int>(async (data, scope) =>
     {
         Type = "number",
         Key = "number",
-        Path = "root/number",
-        Data = null,
         Suppliers = customSuppliers
     });
 });
